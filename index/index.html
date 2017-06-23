@@ -1,0 +1,298 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>铜谷小学-首页</title>
+<style>
+*{
+	margin:0px;
+	padding:0px;
+	border:0px;
+	box-sizing:border-box;
+}
+body{
+	width:1280px;
+	height:720px;
+	overflow:hidden;
+	background-repeat:no-repeat;
+	position: relative;;
+}
+#logo{
+	margin:20px 0px 0px 35px;
+	width:279px;
+	height:46px;
+}
+.video{
+	box-shadow: 0 0px 25px #000;
+    width: 550px;
+    height: 336px;
+	/*position: absolute;
+    left: 118px;
+    top: 144px;*/
+	margin-top:80px;
+	margin-left:118px;
+    padding:12px;
+}
+.video.h{
+	box-shadow: 0 0px 25px #9900ff;
+}
+.video img{
+	width: 100%;
+	height: 100%;
+}
+.links{
+	position: absolute;
+    height: 70px;
+    width: 580px;
+    left: 70px;
+    top: 520px;
+}
+.links .link{
+	height: 72px;
+    width: 176px;
+	border: 5px solid transparent;
+	border-radius: 10px;
+    float: left;
+    margin: 0px 8px;
+}
+.links .link img{
+	margin-left:-4px;
+}
+.links .link.h{
+	border: 5px solid #9900ff;
+    box-shadow: 0px 5px 10px #999;
+}
+.content{
+	width: 543px;
+    height: 543px;
+    position: absolute;
+    right: 30px;
+    top: 110px;
+	
+}
+.content .li{
+	border: 5px solid transparent;
+    border-radius: 20px;
+    margin: 13px;
+    width: 145px;
+    height: 146px;
+    float: left;
+}
+.content .li img{
+	margin:0px 0px 0px -4px;
+    width: 145px;
+}
+.content .li.h{
+	border: 5px solid #9900ff;
+  /*   box-shadow: 0px 5px 10px #999; */
+}
+</style>
+<script type="text/javascript" src="/templatefile/common_res/arttemplate/template-native.js"></script>
+<script type="text/javascript" src="/templatefile/common_res/jquery/jquery.min.js"></script>
+<script type="text/javascript">
+var sub = 0;
+var videoUrl;
+var layout = [
+	[0,0,0,1,2,3],
+	[0,0,0,4,5,6],
+	[10,11,12,7,8,9]
+];
+var layoutX = 3,layoutY = 0;
+var indexUrl;
+sessionStorage.indexUrl = window.location.href;
+(function(){
+	caId='tgxx';
+	$.ajax({
+		url : '/Portal/portal/template/getRegion1?appType=8&caCard='+caId,
+		type: 'POST',
+           data: null,
+		async : false,
+		success : function(data) {
+			data =eval(data)[0];
+			indexUrl = data.page_url;
+			aaa4 = new Date().getTime();
+		},
+		error : function(e) {
+			console.log(e);
+		}
+	});
+}());
+document.onirkeypress = grabEvent;
+document.onkeydown = grabEvent;
+function grabEvent(event){
+	var keyval = event.which;
+	switch(keyval){
+			case 37://left
+			changLR (-1);
+			return false;
+			break;
+		case 39://right
+			changLR (1);
+			return false;
+			break;
+		case 38://up
+			changUD (-1);
+			return false;
+			break;
+		case 40://down
+			changUD (1);
+			return false;
+			break;
+		case 8://back
+		case 27://esc
+			gotoMenu();
+			return false;
+			break;
+		case 52: //4
+			sessionStorage.column_sub = "";
+			window.location.href = "../../5717/index/index.html";
+			return false;
+			break;
+		case 13://enter
+			doSelect();
+			return false;
+			break;
+	}	
+}
+
+function getFocus(){
+	$("#focus"+sub).removeClass("h");
+	sub = layout[layoutY][layoutX];
+	$("#focus"+sub).addClass("h");
+}
+function changLR(num){
+	if((layoutX+num)>=0&&(layoutX+num)<layout[layoutY].length){
+		if(layoutX<3&&layoutY<2&&num>0){
+			layoutX = 2;
+		}else if(layoutX<3&&num<0&&layoutY<2){
+			return false;
+		}
+		layoutX+=num;
+		getFocus();
+	}
+}
+function changUD(num){
+	if((layoutY+num)>=0&&(layoutY+num)<layout.length){
+		if(layoutX<3&&num>0&&layoutY==0){
+			layoutY = 2;
+			layoutX = 0;
+		}else if(sub==layout[layoutY+num][layoutX]){
+			return false;
+		}else{
+			layoutY+=num;	
+		}		
+		getFocus();
+	}
+}
+function gotoMenu(){
+	sessionStorage.column_sub = "";
+	window.location.href=iSTB.browser.gotoSTB('menu');
+}
+function stopVideo(){
+	iSTB.player.stop();
+}
+function doSelect(){
+	if(sub==10){
+		gotoMenu();
+		return false;
+	}
+	sessionStorage.layoutX = layoutX;
+	sessionStorage.layoutY = layoutY;
+	var gourl = $("#focus"+sub).attr("href");
+	sessionStorage.column_sub = "col" + sub;     //传入子栏目用于获取对应图片
+	window.location.href = gourl;
+}
+function loadVideo(){
+	$.ajax({
+		url : '/Portal/portal/template/getTemplate?id=16809&type=5&templateId=10367&appType=8&regionId=2093',
+		type: 'POST',
+		data: null,
+		async : false,
+		success : function(data) {
+			data =eval(data)[0];
+			videoUrl = data.sources[0].source_video;
+			//$(".video>img").attr("src",data.sources[0].source_img);
+			$(".video").attr("href",data.sources[0].source_src);
+			setTimeout(function(){playVideo(videoUrl);},3000);
+		},
+		error : function(e) {
+			console.log(e);
+		}
+	});	
+}
+function playVideo(url){
+	iSTB.player.set_video_window(90, 180, 520, 300);    // 135 163  513*288
+	iSTB.player.play(url);
+	iSTB.player.set_volume(8);
+}
+
+$(function(){
+	if(sessionStorage.layoutX){
+		layoutX = sessionStorage.layoutX*1;
+		layoutY = sessionStorage.layoutY*1;
+	}
+	aaa1 = new Date().getTime();
+	$.ajax({
+		url : '/Portal/portal/template/getTemplate?'+indexUrl,
+		type: 'POST',
+		data: null,
+		async : false,
+		success : function(data) {
+			aaa2 = new Date().getTime();
+			data =eval(data)[0];
+			var html = template('template', data);
+			var html1 = template('template-links', data);
+			document.getElementById('lifecirclebody').innerHTML = html;
+			document.getElementById('links').innerHTML = html1;
+			aaa3 = new Date().getTime();
+			getFocus();
+		},
+		error : function(e) {
+			console.log(e);
+		}
+	});
+	setTimeout(function(){loadVideo(),3000});
+});
+iSTB.evt.set_event_callback("eventCallback");
+function eventCallback(type,event_name,event_type,event_value){
+	switch(event_name){
+		case  "PLAYER_BUFFERING_END":
+			$(".video").html("");
+			break;
+		case "PLAYER_FINISH":
+			stopVideo();
+			playVideo(videoUrl);
+			break;
+	}
+}
+</script>
+</head>
+<body onunload="stopVideo()" background="images/bg.png">
+<div id="logo"><img src="images/bg_logo.png" /></div>
+<div class="video" id="focus0">
+	<img src=""/>
+</div>
+<div class="links" id="links">
+	<script id="template-links" type="text/html">
+		<div class="link" href="iSTB.browser.gotoSTB('menu')" id="focus10">
+			<img src="images/dszb.png"/>
+		</div>
+		<div class="link" href="/templatefile//tv/liaocheng/2214/index/index.html"  id="focus11">
+			<img src="images/zhlc.png"/>
+		</div>
+		<div class="link" href="<%=categorys[9].category_src%>" id="focus12">
+			<img src="<%=categorys[9].category_img%>"/>
+		</div>
+	</script>
+</div>
+<div class="content" id="lifecirclebody">
+	<script id="template" type="text/html">
+		<% for(i=0,y=1,l=categorys.length;i<l&&i<9;i++,y++){%>
+			<div class="li" href="<%=categorys[i].category_src%>" id="focus<%=y%>">
+				<img src="<%=categorys[i].category_img%>"/>
+			</div>
+		<%}%>
+	</script>
+</div>
+</body>
+</html>

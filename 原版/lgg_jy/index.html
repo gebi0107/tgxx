@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>六宫格模板</title>
+<style>
+*{
+	margin:0px;
+	padding:0px;
+	border:0px;
+	box-sizing:border-box;
+}
+body{
+	width:1280px;
+	height:720px;
+	overflow:hidden;
+	background-color:#000;
+	background-repeat:no-repeat;
+}
+.title{
+	font-family:Arial, Helvetica, sans-serif;
+	font-weight:bold;
+	font-size:20px; 
+	text-align:center;
+	color:#FFF; 
+	line-height:30px;
+	}
+.content{
+	width: 1070px;
+    height: 500px;
+    margin: 95px auto 0px;
+}
+.listDiv{
+	height:230px;
+	width:326px;
+	float:left;
+	background-image:url(images/mbkg.png);
+	background-repeat:no-repeat;
+	padding:10px 10px 0px;
+	border:8px solid transparent;
+	border-radius:16px;
+	margin: 0px 15px 35px 15px;
+}
+.listDiv_h{
+	border:8px solid #FBE705;
+}
+.listDiv .pic{
+	width:289px;
+	height:168px;
+}
+.listDiv .pic img{
+	width:290px;
+	height:168px;
+}
+.listDiv .title{
+	color:#333;
+	height:36px;
+	width:100%;
+	line-height:36px;
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow:ellipsis;
+}
+.tools{
+	width: 42px;
+    height: 60px;
+    float: left;
+    margin-top: 330px;
+    display: none;
+	
+}
+#left{
+	background-image:url(images/l.png);
+	margin-left:40px;
+	}
+#right{
+	background-image:url(images/r.png);
+	}
+.explain{
+	font-weight: bolder;
+    color: #043f6d;
+    font-size: 26px;
+    margin: 8px auto 0;
+    width: 1040px;
+    height: 50px;
+    line-height: 50px;
+}
+</style>
+<script type="text/javascript" src="/templatefile/common_res/arttemplate/template-native.js"></script>
+<script type="text/javascript" src="/templatefile/common_res/jquery/jquery.min.js"></script>
+<script language="javascript">
+var columnPos = 0;
+var subNum = 6;
+var totalNum;
+var pageNum = 1;
+var bigTotalNum;
+/******************************** 消息的处理-end ***********************************************/
+document.onirkeypress = grabEvent;
+document.onkeydown = grabEvent;
+function grabEvent(event){
+	var keyval = event.which;
+	switch(keyval){
+		case 1:
+		case 38://up
+			changeUp(-3);
+			return false;
+			break;
+		case 2:
+		case 40://down
+			changeUp(3);
+			return false;
+			break;
+		case 3:
+		case 37://left
+			changeLr(-1);
+			return false;
+			break;
+		case 4:
+		case 39://right
+			changeLr(1);
+			return false;
+			break;
+		case 13:
+			doSelect();
+			return false;
+			break;
+		case 339:
+		case 27://esc 退出到portal页
+			window.location.href = sessionStorage.referUrl;
+			return false;
+			break;
+		case 340:
+		case 8:	
+			/*if(sessionStorage.categorys_lgg){
+				window.location.href = sessionStorage.categorys_lgg;
+				delete sessionStorage.categorys_lgg;
+			}else{
+				window.location.href = sessionStorage.referUrl;
+			}*/
+			if(sessionStorage.subpos01_url){
+				window.location.href = sessionStorage.subpos01_url;
+				delete sessionStorage.subpos01_url;
+			}else{
+				window.location.href = sessionStorage.referUrl;
+				delete sessionStorage.referUrl;
+			}
+
+			return false;
+			break;
+	}
+}
+
+function setFocus(){
+	$(".listDiv:eq("+columnPos+")").addClass("listDiv_h");
+}
+
+function changeLr(num){
+	var listNum = $(".listDiv").length;
+		if((columnPos+num)>=0&&(columnPos+num)<listNum){
+			$(".listDiv").removeClass("listDiv_h");
+			columnPos+=num;	
+			$(".listDiv:eq("+columnPos+")").addClass("listDiv_h");
+		}		
+}
+function changeUp(num){
+	var listNum = $(".listDiv").length;
+		if(columnPos>2&&num>0&&pageNum*subNum<totalNum){
+			initContent(subNum,++pageNum);
+			columnPos=columnPos-3;
+			setFocus();
+		}else if(columnPos<3&&num<0&&pageNum>1){
+			initContent(subNum,--pageNum);
+			columnPos=columnPos+3;
+			setFocus();
+		}else if((columnPos+num)>=0&&(columnPos+num)<listNum){
+			$(".listDiv").removeClass("listDiv_h");
+			columnPos+=num;	
+			$(".listDiv:eq("+columnPos+")").addClass("listDiv_h");
+		}		
+}
+
+function doSelect(){
+	sessionStorage.columnPos = columnPos;
+	sessionStorage.pageNum=pageNum;
+	var theUrl = $(".content .listDiv:eq("+columnPos+")").attr("data_url");
+	window.location.href = theUrl;
+}
+//请求数据接口
+
+function initContent(datasize,pageNum){
+	$.ajax({
+		url : '/Portal/portal/template/getTemplate'+window.location.search+"&datasize="+datasize+"&pageNum="+pageNum,
+		type : 'POST',
+		dataType : 'json',
+		contentType : "application/json",
+		async : false,
+		success : function(data) {			
+			data =eval(data)[0];
+			totalNum = data.totalNum;
+			bigTotalNum = Math.ceil(totalNum/subNum);
+			var html = template('template', data);
+			html = replaceStr(html);
+			document.getElementById('lifecirclebody').innerHTML = html;
+			$("#pageNum").html("第"+pageNum+"页/共"+bigTotalNum+"页");	
+		},
+		error : function(e) {
+			console.log(e);
+		}
+	});
+}
+
+function replaceStr(str){
+	var html = '';
+	html=str.replace(/&#60;/g, "<");
+	html =html.replace(/&#62;/g, ">");
+	html =html.replace(/&#160;/g, "");
+	html =html.replace(/&#38;/g, "&");
+	html =html.replace(/&#34;/g, "\"");
+	html =html.replace(/&#39;/g, "'");
+	html =html.replace(/&#215;/g, "x");
+	html =html.replace(/&#247;/g, "/");
+
+	return html;
+}
+
+$(document).ready(function(){
+	if(typeof(sessionStorage.columnPos)!="undefined"){columnPos = parseInt(sessionStorage.columnPos); delete sessionStorage.columnPos};
+	if(typeof(sessionStorage.pageNum)!="undefined"){pageNum=parseInt(sessionStorage.pageNum); delete sessionStorage.pageNum};
+	initContent(subNum,pageNum);
+});
+</script>
+</head>
+
+<body id="lifecirclebody" background="images/bg.jpg" leftmargin="0" topmargin="0" onLoad="setFocus();">
+<script id="template" type="text/html">
+
+
+	<!--6格展框-->
+	<div class="tools" id="left" style="visibility:hidden;"></div>
+	<div class="content">
+		<% for (i=0, l=sources.length; i<l&&i<6; i++) { %>
+			<div class="listDiv" data_url="<%=sources[i].source_src%>">
+			  <div class="pic"><img id="pic_0" src="<%=sources[i].source_img%>"/></div>
+			  <div class="title"><%=sources[i].source_title%></div>
+			</div>
+		<%}%>
+	</div>
+	<div class="tools" id="right" style="visibility:hidden;"></div>
+	<div class="explain">
+		<span style="float:left;margin-top: -20px;">按上下键翻页，按左右键切换</span>
+		<span style="float:right;margin-top:-20px;" id="pageNum"></span>
+	</div>
+</script>
+</body>
+</html>

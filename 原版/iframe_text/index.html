@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<style>
+*{
+	margin:0px;
+	padding:0px;
+	border:0px;
+	box-sizing:border-box;
+}
+body{
+	width:870px;
+	height:475px;
+	background-repeat:no-repeat;
+	position:relative;
+}
+.content{
+	margin:0px;
+    width: 840px;
+    height: 475px;
+	background: rgba(255, 255, 255, 0.2);
+	border-radius:10px;
+}
+.content .titel{
+	height:48px;
+	line-height:48px;
+	font-size:24px;
+	border-bottom:#9E9D9D 2px solid;
+	opacity:1;
+	text-align:center;
+	font-weight:bold;
+	color:#333333;
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	padding:0px 30px;
+}
+.content .contenta{
+	height:410px;
+	overflow:hidden;
+	position:relative;
+}
+.content .contentb{
+	padding:0px 45px;
+	font-size:30px;
+	line-height:45px;
+	text-indent:2em;
+	position:absolute;
+	top:0px;
+	left:0px;
+	width: 100%;
+}
+.content .contentb img{
+	width:85%;
+	display: block;
+    margin: 0px auto;
+}
+.scroll{
+	width: 6px;
+    background-color: #EEEDED;
+    height: 405px;
+    position: absolute;
+    right: 50px;
+    top: 65px;
+	border-radius:10px;
+}
+.anchor{
+	width:100%;
+	height:100%;
+	position:absolute;
+	top:0px;
+	left:0px;
+	background-color:#FF9B00;
+	border-radius:10px;
+}
+</style>
+<script src="/templatefile/common_res/arttemplate/template-native.js"></script>
+<script src="/templatefile/common_res/jquery/jquery.min.js"></script>
+<script src="/templatefile/common_res/layer/layer.js"></script>
+<script src="/templatefile/common_res/lifecircleapi/common.js"></script>
+<script>
+	var area = 0;
+	var theight = 400;
+	var sheight = 390;
+	var subPosNum = 0;
+	function eventHandler(keyval){
+		//var keyval = event.which;
+		switch(keyval){
+			case 37://left
+				changeLR();
+				return false;
+				break;
+			case 38://up
+				changUP(-1);
+				return false;
+				break;
+			case 40://down
+				changUP(1);
+				return false;
+				break;
+			case 27://esc
+				return false;
+				break;
+			case 8://back
+				history.back();
+				return false;
+				break;
+		}	
+		return false;
+	}
+		function getPos(){
+			aHeight = $(".contentb").outerHeight();
+			subPos = Math.ceil(aHeight/theight);
+			if(subPos==1){
+				$(".scroll").hide();
+				return;
+			}else{
+				subPos=subPos*2;
+			}
+			smheight = 1/subPos*sheight;
+			theight = theight/2;
+			$(".anchor").height(smheight);
+			
+		}
+		
+		function changeLR(){
+				parent.area = 0;
+				parent.getPos();
+			}
+		
+		function changUP(num){
+			if((subPosNum+num)>=0&&(subPosNum+num)<subPos){
+				subPosNum+=num;
+				$(".anchor").css("top",smheight*subPosNum);
+				$(".contentb").css("top",-theight*subPosNum);
+			}		
+		}
+		
+		
+		
+</script>
+</head>
+<body id="lifecirclebody" onload="getPos()">
+	<script id="template" type="text/html">
+
+	<div class="content">
+		<div class="titel"><%=sources[0].source_title%></div>
+		<div class="contenta">
+			<div class="contentb">
+				<%=sources[0].source_content%>
+			</div>
+		</div>
+	</div>
+	<div class="scroll">
+		<div class="anchor"></div>
+	</div>
+	</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+index  --  首页
+dxzc   --  二级导学之窗
+xyly   --  二级校园掠影
+left-right  --  列表左右模板
+left-right-content-pic  --  列表左右模板iframe里面的图片列表模板
+left-right-content-text  --  列表左右模板iframe里面的文字列表模板
+text --  内容页模板
+myschool  --  首页iframe模板
+mediaPlay --  视频播放页模板

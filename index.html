@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .list{
+            border:1px solid red;
+            width:80px;
+            height:20px;
+            float: left;
+        }
+        .list.hover{
+            border:1px solid blue;
+        }
+        .cor{
+            border:1px solid yellow;
+            width:80;
+            height:20px;
+        }
+        .cor.up{
+            display:none;
+        }
+        .cor.down{
+            display:none;
+        }
+    </style>
+    <script src="jquery.min.js"></script>
+    <script>
+
+        document.onirkeypress = grabEvent;
+        document.onkeydown = grabEvent;
+        function grabEvent(event){
+            var keyval = event.which;
+            switch(keyval){
+                case 39://right
+                    changLR(1);
+                    return false;
+                    break;
+                case 37://left
+                    changLR(-1);
+                    return false;
+                    break;
+            }
+            return false;
+        }
+
+
+        var data={
+            "arr":[
+                {"arr_title":"data_1"},
+                {"arr_title":"data_2"},
+                {"arr_title":"data_3"},
+                {"arr_title":"data_4"},
+                {"arr_title":"data_5"},
+                {"arr_title":"data_6"},
+                {"arr_title":"data_7"},
+                {"arr_title":"data_8"},
+                {"arr_title":"data_9"},
+                {"arr_title":"data_10"}
+                ]
+        }
+
+        var liPos=0;
+        var liPosition=0;
+
+        function changLR(num){
+            $(".list:eq("+liPos+")").removeClass("hover");
+            if(num<0 && liPos>0){
+
+                if(liPosition>0){
+                    liPos--;
+                    liPosition--;
+                }else{
+                    liPos--;
+                }
+            }else if(num>0 && liPos<data.arr.length-1){
+                if(liPosition<5){
+                    liPos++;
+                    liPosition++;
+                }else{
+                    liPos++;
+                }
+            }
+
+            getList();
+        }
+
+        function getList(){
+            $(".list:eq("+liPos+")").addClass("hover");
+            if(liPosition==0){
+                for(i=0;i<data.arr.length;i++){
+                   if(i<liPos || i>liPos+5){
+                        $(".list:eq("+i+")").css("display","none");
+                    }else{
+                        $(".list:eq("+i+")").css("display","");
+                    }
+                }
+            }else if(liPosition==5){
+                for(i=0;i<data.arr.length;i++){
+                    if(i<liPos-5 || i>liPos){
+                        $(".list:eq("+i+")").css("display","none");
+                    }else{
+                        $(".list:eq("+i+")").css("display","");
+                    }
+                }
+            }else{
+                return;
+            }
+
+            if($(".list:eq("+0+")").css("display")=="none"){
+                alert("1");
+                $(".up").css("visibility","visible");
+            }else{
+                //alert("2");
+                $(".up").css("visibility","hidden");
+            }
+            if($(".list:eq("+(data.arr.length-1)+")").css("display") == "none"){
+                alert("3");
+                $(".down").css("visibility","visible");
+            }else{
+                $(".down").css("visibility","hidden");
+            }
+        }
+
+        $(function(){
+            getList();
+        });
+
+    </script>
+</head>
+<body>
+    <div class="cor up"></div>
+    <ul>
+    <li class="list">1</li>
+    <li class="list">2</li>
+    <li class="list">3</li>
+    <li class="list">4</li>
+    <li class="list">5</li>
+    <li class="list">6</li>
+    <li class="list">7</li>
+    <li class="list">8</li>
+    <li class="list">9</li>
+    <li class="list">10</li>
+    </ul>
+<div class="cor down"></div>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>分类模版-左右嵌入式</title>
+<style>
+*{
+	margin:0px;
+	padding:0px;
+	border:0px;
+	box-sizing:border-box;
+}
+body{
+	background-image:url(images/bg.jpg);
+	background-repeat:no-repeat;
+	width:1280px;
+	height:720px;
+	overflow:hidden;
+	background-color:#000;
+}
+#logo{
+	position:absolute;
+	top:25px;
+	left:370px;
+	width:176px;
+	height:57px;
+	background-image:url(images/bjyd.png);
+	background-repeat:no-repeat;
+}
+.left{
+	margin:120px 0px 0px 50px;
+	padding-top:18px;
+    width: 239px;
+    height: 468px;
+	float:left;
+}
+.li{
+	width:185px;
+	height:76px;
+	margin:0px auto 19px;
+	border: transparent solid 3px;
+	border-radius:9px;
+	}
+.li img{
+	width:196px;
+	height:86px;
+	margin:-8px 0 0 -8px;
+	}
+.li.hover{
+	border: #FFE400 solid 3px;
+	}
+.li.visit{
+	color:#ff0000;
+	}
+#ifm{
+	width:880px;
+	height:475px;
+	float:left;
+	margin:140px 0px 0px 5px;
+	}
+</style>
+<script src="/templatefile/common_res/arttemplate/template-native.js"></script>
+<script src="/templatefile/common_res/jquery/jquery.min.js"></script>
+<script src="/templatefile/common_res/lifecircleapi/common.js"></script>
+<script>
+	var area=0;
+	var liPos=0;
+		
+	document.onirkeypress = grabEvent;
+	document.onkeydown = grabEvent;
+	function grabEvent(event){
+		var keyval = event.which;
+		if(area == 1){
+			var returnVal = document.getElementById("ifm").contentWindow.eventHandler(keyval);
+			return;
+		}
+		switch(keyval){
+			/*case 37://left
+				changLR(-1);
+				event.stopPropagation();
+				break;*/
+			case 39://right
+				changLR(1);
+				event.stopPropagation();
+				break;
+			case 38://up
+				changUP(-1);
+				event.stopPropagation();
+				break;
+			case 40://down
+				changUP(1);
+				event.stopPropagation();
+				break;
+			case 27://esc
+				event.stopPropagation();
+				break;
+			case 8://back
+				//return EVENT.STOP;
+				goback();
+				break;
+			case 13://Enter
+				doSelect();
+				//return EVENT.STOP;
+				break;
+		}	
+		event.stopPropagation();
+	}
+	
+	function changUP(num){
+		if((liPos+num)<0||(liPos+num)>=$(".li").length){
+			return;
+		}
+		$(".li:eq("+liPos+")").removeClass("hover");
+		$(".li:eq("+liPos+")").removeClass("visit");
+		liPos+=num;
+		$(".li:eq("+liPos+")").addClass("hover");
+		goUrl = $(".li:eq("+liPos+")").attr("theUrl");
+		$("iframe").attr("src",goUrl);
+	}
+	function changLR(num){
+		if(num>0){
+			var theObj = $(".li:eq("+liPos+")");
+			theObj.removeClass("hover");
+			theObj.addClass("visit");
+			area = 1;
+			document.getElementById("ifm").contentWindow.getPos();
+		}				
+	}
+	function getPos(){
+		if(typeof(sessionStorage.area_sec)!="undefined"){
+			area=parseInt(sessionStorage.area_sec,"10");
+			liPos=parseInt(sessionStorage.liPos_parent_class,"10");
+			delete sessionStorage.area_sec;
+			delete sessionStorage.liPos_parent_class;
+			$(".li:eq("+liPos+")").addClass("visit");
+			goUrl = $(".li:eq("+liPos+")").attr("theUrl");
+			$("iframe").attr("src",goUrl);
+			setTimeout(function(){document.getElementById("ifm").contentWindow.getPos()},600)
+			//document.getElementById("ifm").contentWindow.getPos();
+			return;
+		}
+		$(".li:eq("+liPos+")").addClass("hover");
+	}
+	$(function(){
+		getPos();
+	});
+	function goback(){
+		if(sessionStorage.subpos01_url){
+			window.location.href = sessionStorage.subpos01_url;
+			delete sessionStorage.subpos01_url;
+		}else{
+			window.location.href = sessionStorage.referUrl;
+			delete sessionStorage.referUrl;
+		}
+		
+		
+	}
+</script>
+</head>
+<body id="lifecirclebody">
+	
+<script id="template" type="text/html">
+	<div id="logo"></div>
+<div class="left">
+<% for(i=0,l=categorys.length;i<l;i++){%>
+	<div class="li" theUrl="<%=categorys[i].category_src%>">
+		<img src="<%=categorys[i].category_img%>" />
+	</div>
+<%}%>
+</div>
+<iframe id="ifm" src="<%=categorys[0].category_src%>"></iframe>
+</script>
+</body>
+</html>

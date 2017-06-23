@@ -1,0 +1,251 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>我的校园</title>
+<style>
+	*{
+		margin: 0px;
+		padding: 0px;
+		border: 0px;
+	}
+	html{
+		padding:5px;
+		margin:5px 15px;
+	}
+	.sub{
+		border:5px solid transparent;
+		float:left;
+		border-radius:5px;
+	}
+	.sub_h{
+		border:5px solid #FFF000;
+		float:left;
+		border-radius:4px;
+		box-shadow:0 0px 25px #000;
+	}
+</style>
+<script type="text/javascript" src="/templatefile/common_res/arttemplate/template-native.js"></script>
+<script type="text/javascript" src="/templatefile/common_res/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="/templatefile/common_res/lifecircleapi/common.js"></script>
+<script>
+	var subPos = 0;
+	var subPos_h=0;
+//键盘操作
+	function eventHandler(keyval){
+		switch(keyval){
+			case 37://left
+				changLR(-1);
+				break;
+			case 39://right
+				changLR(1);
+				break;
+			case 38://up
+				changUP(-1);
+				break;
+			case 40://down
+				changUP(1);
+				break;
+			case 27://esc
+				break;
+			case 8://back
+				break;
+			case 13:
+				doSelect();
+				break;
+		}	
+	}
+//键盘操作end
+function getPos(){
+		subNum = $(".li").length;
+		$(".li:eq("+subPos+")").addClass("sub_h");
+	}
+	
+	function changUP(num) {
+			
+			if(num>0 && (subPos+2)< subNum && subPos!=1) {
+					
+					if(subPos==0) {
+							$(".li:eq("+subPos+")").removeClass("sub_h");
+							subPos_h=subPos;
+							subPos+=3;
+							getPos();
+						} else {
+								$(".li:eq("+subPos+")").removeClass("sub_h");
+								subPos_h=subPos;
+								subPos+=2;
+								getPos();
+							}
+				}else if(num<0) {
+					
+						if((subPos-2)>0) {
+								if(subPos==3) {
+										$(".li:eq("+subPos+")").removeClass("sub_h");
+										subPos_h=subPos;
+										subPos-=3;
+										getPos();
+									}else{
+											$(".li:eq("+subPos+")").removeClass("sub_h");
+											subPos_h=subPos;
+											subPos-=2;
+											getPos();
+										}
+								
+							} else {
+									
+									$(".li:eq("+subPos+")").removeClass("sub_h");
+									parent.areaPos = 0;
+									parent.back();
+								}
+					}
+		}
+
+	function changLR(num){
+		if(num>0){//向右
+			if(subPos==1){
+				if(subPos_h==0){subPos=2;}
+				if(subPos_h==3){subPos=4;}
+				if(subPos_h==5){subPos=6;}
+				subPos_h=1;
+				$(".li:eq("+1+")").removeClass("sub_h");
+				getPos();
+			}
+			if(subPos==3||subPos==5){
+				$(".li:eq("+subPos+")").removeClass("sub_h");
+				subPos_h=subPos;
+				subPos=1;//大图焦点	
+				getPos();
+			}else 
+			if((subPos+num)<$(".li").length){
+				$(".li:eq("+subPos+")").removeClass("sub_h");
+				subPos_h=subPos;
+				subPos+=(num);
+				getPos();
+			}
+		}else{//向左
+			if(subPos==1){
+				if(subPos_h==2){subPos=0;}
+				if(subPos_h==4){subPos=3;}
+				if(subPos_h==6){subPos=5;}
+				subPos_h=1;
+				$(".li:eq("+1+")").removeClass("sub_h");
+				getPos();
+			}
+			if(subPos==4||subPos==6){
+				$(".li:eq("+subPos+")").removeClass("sub_h");
+				subPos_h=subPos;
+				subPos=1;//大图焦点	
+				getPos();			
+				}else if((subPos+num)>=0){
+			$(".li:eq("+subPos+")").removeClass("sub_h");
+			subPos_h=subPos;
+			subPos+=(num);
+			getPos();
+		    }
+       }
+
+		}
+	function doSelect(){
+		sessionStorage.appMenuPos = parent.menuPos;
+		sessionStorage.appsubPos = subPos;
+		gourl = $(".li:eq("+subPos+")").attr("theUrl");
+		var thetmp = parseInt(getUrlParams("templateId",gourl),10);
+		if(thetmp==2238){
+			$.ajax({
+				url : '/Portal/portal/template/getTemplate?'+gourl.split("?")[1],
+				type: 'POST',
+				data: null,
+				async : false,
+				success : function(data) {
+					thedata =eval(data)[0];
+					top.location.href = thedata.page[0].page_extiframeurl;
+					//$("#ifm").attr("src",data.categorys[0].category_src);				
+				},
+				error : function(e) {
+					console.log(e);
+				}
+			});
+		}else{
+			top.location.href = gourl;
+		}
+	}
+	
+	function getUrlParams(_key, _url, _spliter) {
+	if (typeof(_url) == "object") {
+		var url = _url.location.href;
+	} else {
+		var url = _url ? _url : window.location.href;
+	}
+	if (url.indexOf("?") == -1 && url.indexOf("#") == -1) {
+		return "";
+	}
+	var spliter = _spliter || "&";
+	var spliter_1 = "#";
+	var haveQuery = false;
+	var x_0 = url.indexOf(spliter);
+	var x_1 = url.indexOf(spliter_1);
+	var urlParams;
+	if (x_0 != -1 || x_1 != -1 || url.indexOf("?") != -1) {
+		if(url.indexOf("?") != -1) urlParams = url.split("?")[1];
+		else if(url.indexOf("#") != -1) urlParams = url.split("#")[1];
+		else urlParams = url.split(spliter)[1];
+		if (urlParams.indexOf(spliter) != -1 || urlParams.indexOf(spliter_1) != -1) {//���ܳ��� url?a=1&b=3#c=2&d=5 url?a=1&b=2 url#a=1&b=2��������
+			var v = [];
+			if(urlParams.indexOf(spliter_1) != -1){
+				v = urlParams.split(spliter_1);
+				urlParams = [];
+				for(var x = 0; x < v.length; x++){
+					urlParams = urlParams.concat(v[x].split(spliter));
+				}
+			}else{
+				urlParams = urlParams.split(spliter);
+			}
+		} else {
+			urlParams = [urlParams];
+		}
+		haveQuery = true;
+	} else {
+		urlParams = [url];
+	}
+	var valueArr = [];
+	for (var i = 0, len = urlParams.length; i < len; i++) {
+		var params = urlParams[i].split("=");
+		if (params[0] == _key) {
+			valueArr.push(params[1]);
+		}
+	}
+	if (valueArr.length > 0) {
+		if (valueArr.length == 1) {
+			return valueArr[0];
+		}
+		return valueArr;
+	}
+	return "";
+}
+
+$(document).ready(function(){
+	if(sessionStorage.appsubPos){
+			subPos = parseInt(sessionStorage.appsubPos,10);
+			delete sessionStorage.appsubPos;
+		}
+		if(sessionStorage.appMenuPos){
+			delete sessionStorage.appMenuPos;
+			 $(".li:eq("+subPos+")").addClass("sub_h");
+			 subNum = $(".li").length;
+			 return;
+		 }
+});
+</script>
+</head>
+<body id="lifecirclebody" style="margin-top:8px;">
+	<script id="template" type="text/html">
+		<div class="li sub" theUrl="<%=categorys[0].category_src%>"><img src="<%=categorys[0].category_img%>"/></div>
+		<div class="li sub" theUrl="<%=categorys[1].category_src%>"><img src="<%=categorys[1].category_img%>"/></div>
+		<div class="li sub" theUrl="<%=categorys[2].category_src%>"><img src="<%=categorys[2].category_img%>"/></div>
+		<div class="li sub" style="top: 342px;position: absolute;margin-top: -160px;" theUrl="<%=categorys[3].category_src%>"><img src="<%=categorys[3].category_img%>"/></div>
+		<div class="li sub" theUrl="<%=categorys[4].category_src%>"><img src="<%=categorys[4].category_img%>"/></div>
+		<div class="li sub" style="top: 504px;position: absolute;margin-top: -160px;" theUrl="<%=categorys[5].category_src%>"><img src="<%=categorys[5].category_img%>"/></div>
+		<div class="li sub" theUrl="<%=categorys[6].category_src%>"><img src="<%=categorys[6].category_img%>"/></div>
+	</script>
+</body>
+</html>

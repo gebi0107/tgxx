@@ -1,0 +1,284 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>详情模版-图文分栏</title>
+<style>
+*{
+	margin:0px;
+	padding:0px;
+	border:0px;
+	box-sizing:border-box;
+}
+body{
+	background-image:url(images/bg.jpg);
+	width:1280px;
+	height:720px;
+	overflow:hidden;
+	background-color:transparent;
+	background-repeat:no-repeat;
+	position: relative;
+}
+.title{
+	position: absolute;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 820px;
+    margin-left: 380px;
+    margin-top: 20px;
+    font-size: 30px;
+    font-weight: bolder;
+    text-align: center;
+    line-height: 55px;
+    color: #101250;
+}
+#pic{
+	float: left;
+    width: 580px;
+    padding-left: 50px;
+    height: 500px;
+    overflow: hidden;
+    text-align: center;
+    margin-top: 125px;
+    display: table;
+    line-height: 500px;
+    position: relative;
+}
+#pic img{
+	vertical-align:middle;
+}
+#imgIndex{
+	margin-left: -50px;
+    left: 50%;
+    width: 140px;
+    background-color: #000;
+    line-height: 40px;
+    height: 40px;
+    bottom: 0px;
+    position: absolute;
+    color: #fff;
+}
+.content{
+	padding: 0px 80px 0px 50px;
+    float: left;
+    margin-top: 125px;
+    width: 700px;
+    height: 540px;
+    overflow: hidden;
+    position: relative;
+}
+#contentb{
+    left: 50px;
+    width: 570px;
+    text-indent: 2em;
+    line-height: 50px;
+    font-size: 34px;
+    position: absolute;
+    top: 0px;
+}
+
+.scroll{
+	width: 6px;
+    background-color: #EEEDED;
+    height: 530px;
+    position: absolute;
+    right: 50px;
+    top: 130px;
+    border-radius: 10px;
+}
+.anchor{
+	width:100%;
+	height:100%;
+	position:absolute;
+	top:0px;
+	left:0px;
+	background-color:#FF9B00;
+	border-radius:10px;
+}
+#full-pic{
+	width: 100%;
+	height:100%;
+	position: absolute;
+	z-index: 9999;
+	background-color: #000;
+	display: none;
+	text-align:center;
+}
+#full-pic img{
+}
+#pl{
+	position: relative;
+	bottom: 100px;
+	color: #e91e63;
+	font-size: 28px;
+	text-indent: 3em;
+}
+#pages{
+	position: relative;
+	bottom: 110px;
+	color: #FFEB3B;
+	font-size: 28px;
+}
+/*播放器模版*/
+.ui{
+	height:60px;
+	width:100%;
+	position:absolute;
+	left:0px;
+	background:rgba(0, 0, 0, 0.70);
+}
+.top{
+	top:0px;
+	font-size:24px;
+	text-align:center;
+	line-height:75px;
+	color:#FFFFFF;
+}
+.bottom{
+	bottom:0px;
+	padding:12px 0px;
+	text-align: center;
+}
+.bottom .time{
+	display: inline-block;
+    width: 80px;
+   /* height: 30px;*/
+    line-height: 30px;
+    color: #FFFFFF;
+    text-align: center;
+}
+.bft{
+	bottom: 3px;
+    display: inline-block;
+    width: 800;
+    background-color: #CCCCCC;
+    position: relative;
+    border-radius: 5px;
+}
+.bftr{
+	height:8px;
+	background-color:#FF3131;
+	left:0px;
+	top:0px;
+	width:0px;
+	border-radius:5px;
+}
+.volumeUi{
+	position:absolute;
+	top:50%;
+	left:50%;
+	width:200px;
+	height:100px;
+	border-radius:15px;
+	background:rgba(0, 0, 0, 0.70);
+	margin:-50px 0px 0px -100px;
+	line-height:100px;
+	color: #FF4A4A;
+	text-align: center;
+	font-size:22px;
+}
+
+</style>
+<script src="/templatefile/common_res/arttemplate/template-native.js"></script>
+<script src="/templatefile/common_res/jquery/jquery.min.js"></script>
+</head>
+<body id="lifecirclebody" onload="">
+<script id="template" type="text/html">
+	<div class="title"><%=sources[0].source_title%></div>
+		<div id="pic">
+			<img src=""/>
+			<div id="imgIndex"></div>	
+		</div>
+		<div class="content">
+			<div id="contentb">
+			<%=sources[0].source_content%></div>
+		</div>
+		<div class="scroll">
+		<div class="anchor"></div>
+	</div>
+	<div id="full-pic">
+		<img src=""/>
+		<div id="pages">图片</div>
+	</div>
+	</script>
+	<script id="video-template" type="text/html">
+		<div class="ui top"><%=sources[0].source_title%></div>
+		<div class="ui bottom">
+			<div class="time left"  id="currTime" goUrl="<%=sources[0].source_video%>"></div>
+			<div class="bft">
+				<div class="bftr" id="bftr"></div>
+			</div>
+			<div class="time left" id="endTime"></div>
+		</div>
+		<div class="volumeUi">加载中...</div>
+	</script>
+	<script>
+// 动态加载js脚本文件
+function loadScript(url) {
+	var oHead = document.getElementsByTagName('HEAD').item(0);
+	var oScript= document.createElement("script");
+	oScript.type = "text/javascript";
+	oScript.src=url;
+	oHead.appendChild( oScript);
+}
+function initContent(){
+	$.ajax({
+		url : '/Portal/portal/template/getTemplate'+window.location.search,
+		type : 'POST',
+		dataType : 'json',
+		contentType : "application/json",
+		async : false,
+		success : function(data){
+			data =eval(data)[0];
+			if(data.sources[0].source_video){
+				$("body").css("background-image","url()");
+				loadScript("js/video.js");
+				var html = template('video-template', data);
+				html = replaceStr(html);
+				document.getElementById('lifecirclebody').innerHTML = html;
+			}else{
+			  	loadScript("js/text.js");
+				var html = template('template', data);
+				html = replaceStr(html);
+				document.getElementById('lifecirclebody').innerHTML = html;
+				var text = data.sources[0].source_content.replace(/<[^<>]+?>/g,'');
+				if(!chkstrlen(text)){
+					$(".content").hide();
+					$("#pic").css({
+						"width":"1180px",
+						"display":"block"
+					});
+				}
+			}		
+		},
+		error : function(e){
+			console.log(e);
+		}
+	});
+}
+
+function replaceStr(str){
+	var html = '';
+	html=str.replace(/&#60;/g, "<");
+	html =html.replace(/&#62;/g, ">");
+	html =html.replace(/&#160;/g, "");
+	html =html.replace(/&#38;/g, "&");
+	html =html.replace(/&#34;/g, "\"");
+	html =html.replace(/&#39;/g, "'");
+	html =html.replace(/&#215;/g, "x");
+	html =html.replace(/&#247;/g, "/");
+	return html;
+}
+function chkstrlen(str){
+　　for(var i = 0;i < str.length; i++){
+　　　if(str.charCodeAt(i) > 255){
+          return true; continue}; //如果是汉字
+　　}
+　　return false;
+}
+$(function(){initContent();});
+</script>
+</body>
+</html>

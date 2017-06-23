@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>专题-列表模版</title>
+<style>
+*{
+	margin:0px;
+	padding:0px;
+	border:0px;
+	box-sizing:border-box;
+}
+.external{
+	width:880px;
+	height:470px;
+	background-repeat:no-repeat;
+	padding:0px 30px 0px 20px;
+	position:relative;
+}
+.list{
+	border-radius: 6px;
+    border-bottom: 1px #5297C5 solid;
+    width: 100%;
+    height: 47px;
+    padding: 0px 20px;
+    margin-bottom: 20px;
+    line-height: 47px;
+    font-size: 22px;
+    white-space: nowrap;
+    overflow: hidden;
+    
+}
+.title_con{
+				width:66%;
+		    text-overflow: ellipsis;
+		    line-height: 47px;
+   		 	font-size: 22px;
+   		 	white-space: nowrap;
+   		 	overflow: hidden;
+   		 	float:left;
+	}
+.author{
+				margin:0 2%;
+				width:10%;
+		    text-overflow: ellipsis;
+		    line-height: 47px;
+   		 	font-size: 22px;
+   		 	white-space: nowrap;
+   		 	overflow: hidden;
+   		 	float:left;
+	}
+.data{
+				width:20%;
+		    text-overflow: ellipsis;
+		    line-height: 47px;
+   		 	font-size: 22px;
+   		 	white-space: nowrap;
+   		 	overflow: hidden;
+   		 	float:right;
+	}
+.list.hover{
+	background-color:#F6CB48;
+}
+.scroll{
+    width: 6px;
+    background-color: #EEEDED;
+    height: 380px;
+    position: absolute;
+    right: 15px;
+    top: 50px;
+    border-radius: 10px;
+	display:none;
+}
+.anchor{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: #FF9B00;
+    border-radius: 10px;
+}
+</style>
+<script src="/templatefile/common_res/arttemplate/template-native.js"></script>
+<script src="/templatefile/common_res/jquery/jquery.min.js"></script>
+<script>
+	function eventHandler(keyval){
+		switch(keyval){
+			case 37://left
+				changLR();
+				break;
+			case 38://up
+				changUP(-1);
+				break;
+			case 40://down
+				changUP(1);
+				break;
+			case 27://esc
+				break;
+			case 8://back
+				parent.goback();
+				break;
+			case 13:
+				doSelect();
+				break;
+		}	
+	}	
+	var area=0;
+	var liPos=0;
+	var pageNum = 1;
+	var subNum = 6;
+	var totalNum;
+	var hheight;
+	
+	var title_data = [];                   //标题日期
+	var title_author = [];                 //标题作者
+	function changUP(num){
+		if((liPos+num)==subNum&&totalNum>subNum&&pageNum*subNum<totalNum){
+			initContent(subNum,++pageNum);
+			liPos=0;
+			getPos();
+			scrool();
+		}else if((liPos+num)==-1&&pageNum>1){
+			initContent(subNum,--pageNum);
+			liPos=5;
+			getPos();
+			scrool();
+		}else if((liPos+num)>=0&&(liPos+num)<$(".list").length){
+			$(".list:eq("+liPos+")").removeClass("hover");
+			liPos+=num;
+			getPos();
+		}		
+	}
+	function getPos(){
+		if(typeof(sessionStorage.liPos_dedjzt_list)!="undefined"){
+			liPos = parseInt(sessionStorage.liPos_dedjzt_list,"10");
+			delete sessionStorage.liPos_dedjzt_list;
+		}
+		$(".list:eq("+liPos+")").addClass("hover");
+	}
+	function changLR(){
+		parent.area = 0;
+		parent.getPos();
+		$(".list:eq("+liPos+")").removeClass("hover");
+		liPos=0;
+	}
+	function doSelect(){
+		sessionStorage.area_dedj = parent.area;
+		sessionStorage.liPos_dedjzt = parent.liPos;
+		sessionStorage.liPos_dedjzt_list = liPos;
+		sessionStorage.pageNum_de01 = pageNum;
+		var theurl = $(".list:eq("+liPos+")").attr("gourl");
+		top.location.href = theurl;
+	}
+	
+//请求数据接口
+var bigData = [];
+function initContent(datasize,pageNum){
+	$.ajax({
+		url : '/Portal/portal/template/getTemplate'+window.location.search+"&datasize="+datasize+"&pageNum="+pageNum,
+		type : 'POST',
+		dataType : 'json',
+		contentType : "application/json",
+		async : false,
+		success : function(data) {			
+			data =eval(data)[0];
+			bigData = data;
+			if(data.page[0]&&data.page[0].first){
+				location.replace(data.sources[0].source_src);
+				return false;
+			}
+			totalNum = data.totalNum;
+			var html = template('template', data);
+			html = replaceStr(html);
+			document.getElementById('lifecirclebody').innerHTML = html;		
+			showTitle();		
+		},
+		error : function(e) {
+			console.log(e);
+		}
+	});
+}
+
+function showTitle() {
+		$(".ceshi").html("ceshi");
+		for(i=0,l=bigData.sources.length;i<l;i++) {
+				if(bigData.sources[i].source_summary.indexOf("&&")>=0) {
+						title_author[i] = bigData.sources[i].source_summary.split("&&")[0];
+						title_data[i] = bigData.sources[i].source_summary.split("&&")[1];
+						$(".list").eq(i).find(".author").html(title_author[i]);
+						$(".list").eq(i).find(".data").html(title_data[i]);
+					}
+			}
+	}
+
+function replaceStr(str){
+	var html = '';
+	html=str.replace(/&#60;/g, "<");
+	html =html.replace(/&#62;/g, ">");
+	html =html.replace(/&#160;/g, "");
+	html =html.replace(/&#38;/g, "&");
+	html =html.replace(/&#34;/g, "\"");
+	html =html.replace(/&#39;/g, "'");
+	html =html.replace(/&#215;/g, "x");
+	html =html.replace(/&#247;/g, "/");
+	return html;
+}
+function scrool(){
+	if(totalNum>subNum){
+		$(".scroll").show();
+		var theheight = $(".scroll").height();		
+		hheight = 1/(Math.ceil(totalNum/subNum))*theheight;
+		var anchor_ = $(".anchor");
+		anchor_.height(hheight);
+		anchor_.css("top",hheight*(pageNum-1));
+	}
+}
+
+
+
+$(document).ready(function(){
+	if(typeof(sessionStorage.subpos_de01)!="undefined"){subpos=parseInt(sessionStorage.subpos_de01,"10"); delete sessionStorage.subpos_de01};
+	if(typeof(sessionStorage.pageNum_de01)!="undefined"){pageNum=parseInt(sessionStorage.pageNum_de01,"10"); delete sessionStorage.pageNum_de01};
+	initContent(subNum,pageNum);
+});
+</script>
+</head>
+<body onLoad="scrool();">
+	<div id="lifecirclebody" >
+	<script id="template" type="text/html">
+		<div class="external" style="">
+				<% for(i=0,l=sources.length;i<l;i++){%>
+					<div class="list" gourl="<%=sources[i].source_src%>">
+						<div class="title_con"><%=sources[i].source_title%></div>
+						<div class="author"></div>
+						<div class="data"></div>
+					</div>
+				<%}%>
+		 </div>
+	 </script>
+     </div>
+	<div class="scroll">
+		<div class="anchor"></div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>精彩课堂</title>
+<style>
+*{
+	margin:0px;
+	padding:0px;
+	border:0px;
+	box-sizing:border-box;
+}
+body{
+	background-image:url(images/bg.png);
+	width:1280px;
+	height:720px;
+	overflow:hidden;
+	background-color:#000;
+	background-repeat:no-repeat;
+}
+#logo{
+	position:absolute;
+	top:25px;
+	left:370px;
+	width:176px;
+	height:57px;
+}
+.content{
+	width:1000px;
+	height:550px;
+	margin:200px auto;
+	overflow:hidden;
+}
+.list{
+	width:300px;
+	height:300px;
+	float:left;
+	margin:auto 50px auto 50px;
+	background-image:url(images/list_bg.png);
+	background-repeat:no-repeat;
+	background-size: 100% auto;
+	display:table;
+}
+.list.h{
+	background-image:url(images/list_bg_hover.png);
+}
+.list.h img{
+	width:55%;
+}
+.list div{
+	display:table-cell;
+	vertical-align:middle;
+	}
+.list div img{
+	width:50%;
+	margin:0px auto;
+	display:block;
+	}
+.list:nth-child(1){
+	margin-left:130px;
+}
+.list:nth-child(4){
+	margin-left:220px;
+}
+</style>
+<script src="/templatefile/common_res/arttemplate/template-native.js"></script>
+<script src="/templatefile/common_res/jquery/jquery.min.js"></script> 
+<script src="/templatefile/common_res/lifecircleapi/common.js"></script>
+<script>
+	var subpos = 0;
+	document.onirkeypress = grabEvent;
+	document.onkeydown = grabEvent;
+	function grabEvent(event){
+		var keyval = event.which;
+		switch(keyval){
+			case 37://left
+				change(-1);
+				return false;
+				break;
+			case 39://right
+				change(1);
+				return false;
+				break;
+			case 38://up
+				change(-3);
+				return false;
+				break;
+			case 40://down
+				change(3);
+				return false;
+				break;
+			case 27://esc
+			case 8://back
+				window.location.href = sessionStorage.referUrl;
+				return false;
+				break;
+			case 13://Enter
+				doSelect();
+				return false;
+				break;
+		}	
+		return false;
+	}
+	function getPos(){
+		if(sessionStorage.subpos01_num){
+			subpos = sessionStorage.subpos01_num-0;
+			delete sessionStorage.subpos01_num;
+			}
+		$(".list:eq("+subpos+")").addClass("h");
+	}
+	function change(num){
+		var listNum = $(".list").length;
+		if((subpos+num)>=0&&(subpos+num)<listNum){
+			$(".list").removeClass("h");
+			subpos+=num;	
+			$(".list:eq("+subpos+")").addClass("h");
+		}		
+	}
+	function doSelect(){
+		var theUrl = $(".list:eq("+subpos+")").attr("gourl");
+		window.location.href = theUrl;
+		sessionStorage.subpos01_num=subpos;
+		sessionStorage.subpos01_url=window.location.href;
+	}
+	function goBack(){
+		//window.location.href ="/templatefile/tv/liaocheng/5891/index/index.html";
+		window.location.href = sessionStorage.referUrl;
+	}
+	$(function(){getPos();})
+</script>
+</head>
+<body id="lifecirclebody">
+<script id="template" type="text/html">
+	<div id="logo">
+		<img src="<%=page[0].img%>" />
+	</div>
+<div class="content">
+	<% for (i=0, l=categorys.length; i<l; i++) { %>
+		<div class="list" gourl="<%=categorys[i].category_src%>">
+			<div><img src="<%=categorys[i].category_img%>"/></div>	
+		</div>
+	<% } %>
+</div>
+</script>
+</body>
+</html>

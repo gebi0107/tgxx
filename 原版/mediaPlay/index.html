@@ -1,0 +1,310 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>播放器</title>
+<style>
+*{
+	margin:0px;
+	padding:0px;
+	border:0px;
+	font-family: "microsoft YaHei";
+	box-sizing:border-box;
+}
+body{
+	background-color:transparent;
+	overflow:hidden;
+	width:1280px;
+	height:720px;
+	position:relative;
+}
+.ui{
+	height:60px;
+	width:100%;
+	position:absolute;
+	left:0px;
+	background:rgba(0, 0, 0, 0.70);
+}
+.top{
+	top:0px;
+	font-size:24px;
+	text-align:center;
+	line-height:75px;
+	color:#FFFFFF;
+}
+.bottom{
+	bottom:0px;
+	padding:12px 0px;
+	text-align: center;
+}
+.bottom .time{
+	display: inline-block;
+    width: 80px;
+   /* height: 30px;*/
+    line-height: 30px;
+    color: #FFFFFF;
+    text-align: center;
+}
+.bft{
+	bottom: 3px;
+    /* top: 0px; */
+    display: inline-block;
+    width: 800;
+    background-color: #CCCCCC;
+    /* height: 8px; */
+    /* float: left; */
+    /* margin-top: 10px; */
+    position: relative;
+    border-radius: 5px;
+}
+.bftr{
+	height:8px;
+	background-color:#FF3131;
+	left:0px;
+	top:0px;
+	width:0px;
+	border-radius:5px;
+}
+.volumeUi{
+	position:absolute;
+	top:50%;
+	left:50%;
+	width:200px;
+	height:100px;
+	border-radius:15px;
+	background:rgba(0, 0, 0, 0.70);
+	margin:-50px 0px 0px -100px;
+	line-height:100px;
+	color: #FF4A4A;
+	text-align: center;
+	font-size:22px;
+}
+</style>
+<script src="/templatefile/common_res/jquery/jquery.min.js"></script>
+<script src="/templatefile/common_res/arttemplate/template-native.js"></script>
+<script>
+function initContent(referVideoID){
+	var url = '/Portal/portal/template/getTemplate'+window.location.search
+	if(referVideoID){
+		url = url+"&type=2&id="+videoId;
+	}
+	$.ajax({
+		url : url,
+		type : 'POST',
+		dataType : 'json',
+		contentType : "application/json",
+		async : false,
+		success : function(data) {		
+			data =eval(data)[0];
+			if(typeof(data.page[0])!="undefined"&&typeof(data.page[0].videoId)!="undefined"){
+				initContent(data.page[0].videoId);
+				return;
+			}
+			var html = template('template', data);
+			html = replaceStr(html);
+			document.getElementById('lifecirclebody').innerHTML = html;				
+		},
+		error : function(e) {
+			console.log(e);
+		}
+	});
+}
+
+function replaceStr(str){
+	var html = '';
+	html=str.replace(/&#60;/g, "<");
+	html =html.replace(/&#62;/g, ">");
+	html =html.replace(/&#160;/g, "");
+	html =html.replace(/&#38;/g, "&");
+	html =html.replace(/&#34;/g, "\"");
+	html =html.replace(/&#39;/g, "'");
+	html =html.replace(/&#215;/g, "x");
+	html =html.replace(/&#247;/g, "/");
+	return html;
+}
+
+$(document).ready(function(){
+	initContent();
+});
+document.onirkeypress = grabEvent;
+document.onkeydown = grabEvent;
+function grabEvent(event){
+	var keyval = event.which;
+//	iDebug(">>>smile grabEvent keyval=" + keyval);
+	switch(keyval){	
+		case 3:
+		case 37:
+			leftAndRight(-1);
+			return false;
+			break;
+		case 4:
+		case 39:
+			leftAndRight(1);
+			return false;
+			break;
+		case 33:
+			changePlayProgress(-30);			//快退
+			return false;
+			break;
+		case 34:	
+			changePlayProgress(30);				//快进	
+			return false;
+			break;
+		case 339:
+		case 27:
+			history.back();
+			return false;
+			break;
+		case 340:
+		case 8:
+			history.back();
+			return false;
+			break;
+		case 13:
+			uiOnOff();
+			return false;
+			break;
+		case 19:
+			doSelect();
+			return false;
+			break;
+	}
+}
+ 	var playProgressTimer
+	var uistate = 1; //进度条状态  1：显示；0；异常
+	var ct;
+	var playing = 1; //播发状态 1；播放
+	var elapsed;//当前时长
+	var duration;//总时长
+//	var ff = 1
+
+function init(){
+	var playUrl = $("#currTime").attr("goUrl");
+	openVideo(playUrl);
+	iSTB.player.set_volume(8); 
+}
+
+function leftAndRight(_num){
+	valeue = iSTB.player.get_volume();
+	valeue = valeue+_num;
+	if(valeue<1)valeue=1;
+	if(valeue>31)valeue=31;
+	iSTB.player.set_volume(valeue); 
+	$(".volumeUi").show();
+	$(".volumeUi").html("当前音量"+" "+valeue); 
+	clearTimeout(ct);
+	ct = setTimeout(function(){$(".volumeUi").hide();}, 1200 );
+}
+function changePlayProgress(_num){
+	clearTimeout(playProgressTimer);
+	if((elapsed+_num > duration)||(elapsed+_num<0)) {return;}
+	elapsed+=_num;
+	iSTB.player.seek(elapsed);
+	if(_num>0){
+		var tt = "<div style='line-height:30px; padding-top:20px;'>快进<br/>"+checkNum(Math.floor(parseInt(elapsed,10)/3600))+":"+checkNum(Math.floor((parseInt(elapsed,10)%3600)/60))+":"+ checkNum(parseInt(elapsed,10)%60)+"/"+checkNum(Math.floor(parseInt(duration,10)/3600))+":"+checkNum(Math.floor((parseInt(duration,10)%3600)/60))+":"+ checkNum(parseInt(duration,10)%60)+"</div>";
+	}else{
+		var tt = "<div style='line-height:30px; padding-top:20px;'>快退<br/>"+checkNum(Math.floor(parseInt(elapsed,10)/3600))+":"+checkNum(Math.floor((parseInt(elapsed,10)%3600)/60))+":"+ checkNum(parseInt(elapsed,10)%60)+"/"+checkNum(Math.floor(parseInt(duration,10)/3600))+":"+checkNum(Math.floor((parseInt(duration,10)%3600)/60))+":"+ checkNum(parseInt(duration,10)%60)+"</div>";
+	}
+	$(".volumeUi").html(tt); 	
+	$(".volumeUi").show();
+	playProgressTimer=setTimeout(function(){volumeUiClear();},1200);	
+}
+function openVideo(_url){
+	iSTB.player.set_video_window(0, 0, 1280, 720);
+	iSTB.player.play(_url);
+	iSTB.player.seek(10);
+}
+function doSelect(){
+	if(playing==1){
+		iSTB.player.pause();
+		playing = 0;
+		$(".volumeUi").html("暂停"); 	
+		$(".volumeUi").show();
+	}else{
+		iSTB.player.resume();
+		playing = 1;
+		$(".volumeUi").html(""); 	
+		$(".volumeUi").hide();
+	}
+}
+function closeVideo(){
+	iSTB.player.stop();
+}
+
+function volumeUiClear(){
+	$(".volumeUi").html("");
+	$(".volumeUi").hide();
+}
+function getDuration(){
+	duration = parseInt(iSTB.player.get_duration(),10);
+	document.getElementById("endTime").innerHTML = checkNum(Math.floor(parseInt(duration,10)/3600))+":"+checkNum(Math.floor((parseInt(duration,10)%3600)/60))+":"+ checkNum(parseInt(duration,10)%60);
+}
+function checkNum(_num){
+	return _num<10?"0"+_num:_num;
+}
+//进度条
+function playProcess(){
+	elapsed = parseInt(iSTB.player.get_position(),10);
+	if(parseInt(elapsed,10) < 2){
+		elapsed = 1;
+	}
+	else if(parseInt(elapsed,10) > parseInt(duration,10)){
+		elapsed = parseInt(duration,10);
+	}
+	document.getElementById("currTime").innerHTML = checkNum(Math.floor(parseInt(elapsed,10)/3600))+":"+checkNum(Math.floor((parseInt(elapsed,10)%3600)/60))+":"+ checkNum(parseInt(elapsed,10)%60);
+	var currProcess = Math.floor(parseInt(elapsed)/parseInt(duration)*800);
+	document.getElementById("bftr").style.width = currProcess + "px";
+
+	setTimeout(function(){playProcess();},1000);	
+}
+
+function exitPage(){
+	closeVideo();
+	history.back();
+}
+function uiOnOff(){
+ 	if(uistate==1){
+		$(".top").animate({top:"-60px"});
+		$(".bottom").animate({bottom:"-60px"});
+		uistate=0;
+	}else{
+		$(".top").animate({top:"0px"});
+		$(".bottom").animate({bottom:"0px"});
+		setTimeout(function(){uiOnOff();},2000);
+		uistate=1;
+	}
+ }
+$(function(){init();});
+iSTB.evt.set_event_callback("eventCallback");
+	function eventCallback(type,event_name,event_type,event_value){
+		switch(event_name){
+			case  "PLAYER_BUFFERING_END":
+				iSTB.player.seek(0);
+				volumeUiClear();
+				getDuration();
+				playProcess();
+				setTimeout(function(){uiOnOff();}, 5000);
+				break;
+			case "PLAYER_FINISH":
+				exitPage();
+				break;
+		}
+	}
+</script>
+</head>
+<body onUnload="exitPage();" leftmargin="0" topmargin="0" id="lifecirclebody">
+	<script id="template" type="text/html">
+		<div class="ui top"><%=sources[0].source_title%></div>
+		<div class="ui bottom">
+			<div class="time left"  id="currTime" goUrl="<%=sources[0].source_video%>"></div>
+			<div class="bft">
+				<div class="bftr" id="bftr"></div>
+			</div>
+			<div class="time left" id="endTime"></div>
+		</div>
+		<div class="volumeUi">加载中...</div>
+		<!-- <div id="aa" style="position:absolute;top:200px;left:200px; font-size:30px; color:red;"></div> -->
+	</script>
+</body>
+<script src="http://tj.lcbtn.com/?u=1"></script>
+</html>
