@@ -6,26 +6,28 @@
     <style>
         .list{
             border:1px solid red;
-            width:80px;
+            width:150px;
             height:20px;
             float: left;
         }
         .list.hover{
             border:1px solid blue;
         }
-        .cor{
-            border:1px solid yellow;
-            width:80;
-            height:20px;
+        .cor {
+            border: 1px solid green;
+            width: 80px;
+            height: 20px;
+            float: left;
         }
-        .cor.up{
-            display:none;
+        .up{
+            visibility:hidden;
         }
-        .cor.down{
-            display:none;
+        .down{
+            visibility:hidden   ;
         }
     </style>
     <script src="jquery.min.js"></script>
+    <script src="template-native.js"></script>
     <script>
 
         document.onirkeypress = grabEvent;
@@ -63,6 +65,11 @@
 
         var liPos=0;
         var liPosition=0;
+
+        function init(){
+            var html=template('template',data);
+            $("#temp").html(html);
+        }
 
         function changLR(num){
             $(".list:eq("+liPos+")").removeClass("hover");
@@ -109,14 +116,14 @@
             }
 
             if($(".list:eq("+0+")").css("display")=="none"){
-                alert("1");
+
                 $(".up").css("visibility","visible");
             }else{
-                //alert("2");
+
                 $(".up").css("visibility","hidden");
             }
             if($(".list:eq("+(data.arr.length-1)+")").css("display") == "none"){
-                alert("3");
+
                 $(".down").css("visibility","visible");
             }else{
                 $(".down").css("visibility","hidden");
@@ -124,25 +131,22 @@
         }
 
         $(function(){
+            init();
             getList();
         });
 
     </script>
 </head>
 <body>
-    <div class="cor up"></div>
-    <ul>
-    <li class="list">1</li>
-    <li class="list">2</li>
-    <li class="list">3</li>
-    <li class="list">4</li>
-    <li class="list">5</li>
-    <li class="list">6</li>
-    <li class="list">7</li>
-    <li class="list">8</li>
-    <li class="list">9</li>
-    <li class="list">10</li>
+    <div class="cor up">forward</div>
+    <ul id="temp">
+        <script id="template" type="text/html">
+            <%for(i=0;i<arr.length;i++){%>
+            <div class="list"><%=arr[i].arr_title%></div>
+            <%}%>
+        </script>
+
     </ul>
-<div class="cor down"></div>
+<div class="cor down">back</div>
 </body>
 </html>
