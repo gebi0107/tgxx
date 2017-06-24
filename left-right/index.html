@@ -107,18 +107,15 @@ body{
 		success : function(data) {
 			
 				data =eval(data)[0];
-				switch(data.page[0].column){
-						case "bjyd":    //班级园地
-							column = "bjyd";
+				switch(sessionStorage.column_sub){
+						case "col4":    //班级小天地
+							column = "col4";
 							break;
-						case "cyzc":   //雏鹰展翅
-							column = "cyzc";
+						case "col5":   //学校大舞台
+							column = "col5";
 							break;
-						case "jzxx":  //家长学校
-							column = "jzxx";
-							break;
-						case "xxjj":  //校园简介
-							column = "xxjj";
+						case "col8":  //家长学校
+							column = "col8";
 							break;
 						default:
 							alert("未获取到column值");
@@ -127,8 +124,10 @@ body{
 				var html = template('template', data);
 				html = replaceStr(html);
 				document.getElementById('lifecirclebody').innerHTML = html;
+				for(i=0;i<data.categorys.length;i++){
+				    $(".li:eq("+i+")").find("img").attr("src","images/"+column+"/column_0<%=i%>"+i+".png");
+				}
 				initPic();
-				sessionStorage.column_sub = column;       //二级栏目名称，用于初始化子栏目背景、logo、栏目图片
 				
 		},
 		error : function(e) {
@@ -138,7 +137,7 @@ body{
 }
 
 function initPic() {
-		$("body").css("background-image","url(images/" + column +"/bg.png)");
+		$("body").css("background-image","url(images/" + column +"/bg.jpg)");
 		$("#logo").find("img").attr("src","images/" + column +"/logo.png");
 	}
 
@@ -160,20 +159,14 @@ function replaceStr(str){
 		if((liPos+num)<0||(liPos+num)>=$(".li").length){
 			return;
 		}
-		$(".li:eq("+liPos+")").find("img").attr("src","images/"+column+"/column_0"+(liPos+1)+".png");
-		//$(".li:eq("+liPos+")").removeClass("hover");
-		//$(".li:eq("+liPos+")").removeClass("visit");
+		$(".li:eq("+liPos+")").find("img").attr("src","images/"+column+"/column_0"+liPos+".png");
 		liPos+=num;
-		$(".li:eq("+liPos+")").find("img").attr("src","images/"+column+"/columnhover_0"+(liPos+1)+".png");
-		//$(".li:eq("+liPos+")").addClass("hover");
+		$(".li:eq("+liPos+")").find("img").attr("src","images/"+column+"/columnhover_0"+liPos+".png");
 		goUrl = $(".li:eq("+liPos+")").attr("theUrl");
 		$("iframe").attr("src",goUrl);
 	}
 	function changLR(num){
 		if(num>0){
-			//var theObj = $(".li:eq("+liPos+")");
-			//theObj.removeClass("hover");
-			//theObj.addClass("visit");
 			area = 1;
 			document.getElementById("ifm").contentWindow.getPos();
 		}				
@@ -184,16 +177,11 @@ function replaceStr(str){
 			liPos=parseInt(sessionStorage.liPos_dedjzt,"10");
 			delete sessionStorage.area_dedj;
 			delete sessionStorage.liPos_dedjzt;
-			//$(".li:eq("+liPos+")").addClass("visit");
-			//$(".li:eq("+liPos+")").find("img").attr("src","images/"+column+"/columnhover_0"+(liPos+1)+".png");
 			goUrl = $(".li:eq("+liPos+")").attr("theUrl");
 			$("iframe").attr("src",goUrl);
-			setTimeout(function(){document.getElementById("ifm").contentWindow.getPos()},600)
-			//document.getElementById("ifm").contentWindow.getPos();
-			//return;
+			setTimeout(function(){document.getElementById("ifm").contentWindow.getPos()},600);
 		}
-		$(".li:eq("+liPos+")").find("img").attr("src","images/"+column+"/columnhover_0"+(liPos+1)+".png");
-		//$(".li:eq("+liPos+")").addClass("hover");
+		$(".li:eq("+liPos+")").find("img").attr("src","images/"+column+"/columnhover_0"+liPos+".png");
 	}
 	$(function(){
 		initContent();
@@ -213,7 +201,7 @@ function replaceStr(str){
 		
 		
 	}
-	<img src="images/bjyd/bg.png" height="720" width="1280"/><img src="images/bjyd/bg.png" height="720" width="1280"/></script>
+	</script>
 </head>
 <body id="lifecirclebody">
 <script id="template" type="text/html">
@@ -223,7 +211,7 @@ function replaceStr(str){
 <div class="left">
 <% for(i=0,l=categorys.length;i<l;i++){%>
 	<div class="li" theUrl="<%=categorys[i].category_src%>">
-		<img src='images/<%=page[0].column%>/column_0<%=i+1%>.png'/>
+		<img src="" />
 	</div>
 <%}%>
 </div>
