@@ -20,7 +20,7 @@ body{
 #logo{
 	position:absolute;
 	top:25px;
-	left:370px;
+	left:335px;
 	width:176px;
 	height:57px;
 }
@@ -107,25 +107,13 @@ body{
 		success : function(data) {
 			
 				data =eval(data)[0];
-				switch(sessionStorage.column_sub){
-						case "col4":    //班级小天地
-							column = "col4";
-							break;
-						case "col5":   //学校大舞台
-							column = "col5";
-							break;
-						case "col8":  //家长学校
-							column = "col8";
-							break;
-						default:
-							alert("未获取到column值");
-					}
+            	column = sessionStorage.column_sub;
 				
 				var html = template('template', data);
 				html = replaceStr(html);
 				document.getElementById('lifecirclebody').innerHTML = html;
 				for(i=0;i<data.categorys.length;i++){
-				    $(".li:eq("+i+")").find("img").attr("src","images/"+column+"/column_0<%=i%>"+i+".png");
+				    $(".li:eq("+i+")").find("img").attr("src","images/"+column+"/column_0"+i+".png");
 				}
 				initPic();
 				

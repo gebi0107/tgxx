@@ -17,11 +17,7 @@ body{
 	background-repeat:no-repeat;
 	position: relative;;
 }
-#logo{
-	margin:20px 0px 0px 35px;
-	width:279px;
-	height:46px;
-}
+
 .video{
 	box-shadow: 0 0px 25px #000;
     width: 550px;
@@ -29,7 +25,7 @@ body{
 	/*position: absolute;
     left: 118px;
     top: 144px;*/
-	margin-top:80px;
+	margin-top:142px;
 	margin-left:118px;
     padding:12px;
 }
@@ -44,8 +40,8 @@ body{
 	position: absolute;
     height: 70px;
     width: 580px;
-    left: 70px;
-    top: 520px;
+    left: 100px;
+    top: 395px;
 }
 .links .link{
 	height: 72px;
@@ -67,7 +63,7 @@ body{
     height: 543px;
     position: absolute;
     right: 30px;
-    top: 110px;
+    top: -10px;
 	
 }
 .content .li{
@@ -186,6 +182,7 @@ function changUD(num){
 }
 function gotoMenu(){
 	sessionStorage.column_sub = "";
+    sessionStorage.referUrl = "";
 	window.location.href=iSTB.browser.gotoSTB('menu');
 }
 function stopVideo(){
@@ -200,6 +197,7 @@ function doSelect(){
 	sessionStorage.layoutY = layoutY;
 	var gourl = $("#focus"+sub).attr("href");
 	sessionStorage.column_sub = "col" + sub;     //传入子栏目用于获取对应图片
+    sessionStorage.referUrl = window.location.href;
 	window.location.href = gourl;
 }
 function loadVideo(){
@@ -221,7 +219,7 @@ function loadVideo(){
 	});	
 }
 function playVideo(url){
-	iSTB.player.set_video_window(90, 180, 520, 300);    // 135 163  513*288
+	iSTB.player.set_video_window(135, 115, 522, 385);    // 135 163  513*288
 	iSTB.player.play(url);
 	iSTB.player.set_volume(8);
 }
@@ -268,7 +266,6 @@ function eventCallback(type,event_name,event_type,event_value){
 </script>
 </head>
 <body onunload="stopVideo()" background="images/bg.png">
-<div id="logo"><img src="images/bg_logo.png" /></div>
 <div class="video" id="focus0">
 	<img src=""/>
 </div>

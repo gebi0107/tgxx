@@ -69,6 +69,10 @@
         function init(){
             var html=template('template',data);
             $("#temp").html(html);
+            for(i=0;i<data.arr.length;i++){
+                $(".list:eq("+i+")").html(sessionStorage.test+i);
+            }
+
         }
 
         function changLR(num){
@@ -129,8 +133,14 @@
                 $(".down").css("visibility","hidden");
             }
         }
-
+        sessionStorage.test = "session";
+        var sess = sessionStorage.test;
+        function getSess(){
+            return sessionStorage.test;
+        }
         $(function(){
+
+
             init();
             getList();
         });
@@ -142,7 +152,7 @@
     <ul id="temp">
         <script id="template" type="text/html">
             <%for(i=0;i<arr.length;i++){%>
-            <div class="list"><%=arr[i].arr_title%></div>
+            <div class="list"></div>
             <%}%>
         </script>
 

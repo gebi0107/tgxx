@@ -150,6 +150,7 @@
 		sessionStorage.pageNumIndex = pageNumIndex;
 		sessionStorage.liPos_sub = liPos;
 		sessionStorage.subpos01_url= top.location.href;
+        sessionStorage.liPosition = parent.liPosition;
 		var theurl = $(".list:eq("+liPos+")").attr("gourl");
 		top.location.href = theurl;
 	}

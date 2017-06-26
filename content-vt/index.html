@@ -20,9 +20,10 @@ body{
 	position: relative;
 }
 #logo{
-	margin-top:65px;
-	margin-left:315px;
-	width:177px;
+	position:absolute;
+	top:25px;
+	left:335px;
+	width:217px;
 	height:57px;
 }
 .title{
@@ -30,8 +31,8 @@ body{
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: 820px;
-    margin-left: 380px;
+    width: 660px;
+    margin-left: 555px;
     margin-top: 20px;
     font-size: 30px;
     font-weight: bolder;
@@ -188,10 +189,12 @@ body{
 </style>
 <script src="/templatefile/common_res/arttemplate/template-native.js"></script>
 <script src="/templatefile/common_res/jquery/jquery.min.js"></script>
+	<script src="../lgg/common.js"></script>
 </head>
 <body id="lifecirclebody" onload="">
-<div id="logo"></div>
+
 <script id="template" type="text/html">
+	<div id="logo"></div>
 	<div class="title"><%=sources[0].source_title%></div>
 		<div id="pic">
 			<img src=""/>
@@ -269,7 +272,10 @@ function initContent(){
 function initBackground(){
 	if(sessionStorage.column_sub) {
 		$("body").css("background-image","url(images/" + sessionStorage.column_sub +"/bg.png)");
-		$("#logo").css("background-image","url(images/" + sessionStorage.column_sub +"/bg_logo.png)");
+		if(sessionStorage.column_sub != "col7" && sessionStorage.column_sub != "col12"){
+            $("#logo").css("background-image","url(images/" + sessionStorage.column_sub +"/logo.png)");
+		}
+
 	}
 }
 
