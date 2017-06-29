@@ -202,14 +202,14 @@ function doSelect(){
 }
 function loadVideo(){
 	$.ajax({
-		url : '/Portal/portal/template/getTemplate?id=16809&type=5&templateId=10367&appType=8&regionId=2093',
+		url : '/Portal/portal/template/getTemplate?id=19053&type=5&templateId=10663&appType=8&regionId=2093',
+		//id=19053&type=5&templateId=10663&regionId=2093
 		type: 'POST',
 		data: null,
 		async : false,
 		success : function(data) {
 			data =eval(data)[0];
 			videoUrl = data.sources[0].source_video;
-			//$(".video>img").attr("src",data.sources[0].source_img);
 			$(".video").attr("href",data.sources[0].source_src);
 			setTimeout(function(){playVideo(videoUrl);},3000);
 		},
